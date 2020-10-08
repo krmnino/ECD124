@@ -17,8 +17,7 @@ PinArray* init_arr(size_t size_){
         return NULL;
     }
     for(int i = 0; i < size_; i++){
-        pin_array->arr[i].pin_id = i; 
-        pin_array->arr[i].duty_cycle = 0.5;
+        init_pin(&pin_array->arr[i], i, 0.5);
     }
     return pin_array;
 }
