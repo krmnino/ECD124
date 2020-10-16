@@ -1,4 +1,6 @@
-#include <stdio.h>
+#ifndef PIN
+#define PIN
+
 #include <stdlib.h>
 
 typedef struct Pin{
@@ -18,6 +20,4 @@ Pin* create_pin(int pin_id_, double duty_cycle_){
     return pin;
 }
 
-void print_pin(Pin* pin){
-    printf("Pin ID: %d\nDuty Cycle: %f\n", pin->pin_id, pin->duty_cycle);   
-}
+#endif

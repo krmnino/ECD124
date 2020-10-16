@@ -1,4 +1,5 @@
-#include <stdio.h>
+#ifndef PINARR
+#define PINARR
 
 #include "Pin.h"
 
@@ -12,7 +13,6 @@ PinArray* init_arr(size_t size_){
     pin_array->size = size_;
     pin_array->arr = (Pin*)malloc(sizeof(Pin) * size_);
     if(pin_array->arr == NULL){
-        printf("Error allocating space.");
         return NULL;
     }
     for(int i = 0; i < size_; i++){
@@ -36,8 +36,4 @@ void sort_duty_cycles(PinArray* pin_array){
     free(temp);
 }
 
-void print_arr(PinArray* pin_array){
-    for(int i = 0; i < pin_array->size; i++){
-        print_pin(&pin_array->arr[i]);
-    }
-}
+#endif
