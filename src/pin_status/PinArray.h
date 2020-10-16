@@ -1,7 +1,9 @@
+#ifndef DEBUG
+#include "Pin.h"
+#endif
+
 #ifndef PINARR
 #define PINARR
-
-#include "Pin.h"
 
 typedef struct PinArray{
     Pin* arr;
@@ -16,7 +18,7 @@ PinArray* init_arr(size_t size_){
         return NULL;
     }
     for(int i = 0; i < size_; i++){
-        init_pin(&pin_array->arr[i], i, 0.0);
+        init_pin(&pin_array->arr[i], i, 0.5);
     }
     return pin_array;
 }
