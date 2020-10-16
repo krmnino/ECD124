@@ -1,10 +1,13 @@
+ifeq ($(DEBUG),1)
+TARGET=pin_array
+CC=gcc
+CCFLAGS = -Wall -DDEBUG
+HEADERS = Pin.h PinArray.h DebugUtil.h
+else
 TARGET=pin_array
 CC=gcc
 CCFLAGS = -Wall
 HEADERS = Pin.h PinArray.h
-
-ifdef DEBUG
-	HEADERS += DebugUtil.h
 endif
 
 $(TARGET): main.o
