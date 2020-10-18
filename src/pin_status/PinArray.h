@@ -19,26 +19,30 @@ PinArray* init_arr(size_t size_){
     }
     int i;
     for(i = 0; i < size_; i++){
-        init_pin(&pin_array->arr[i], i, 0.25 * i);
+        init_pin(&pin_array->arr[i], i, 0, 0);
     }
     return pin_array;
 }
 
+void swap(Pin* p1, Pin* p2){
+    Pin temp = *p1;
+    *p1 = *p2;
+    *p2 = temp;
+    return;
+}
+
 //Sort pins by duty cycles using insertion sort
 void sort_duty_cycles(PinArray* pin_array){
-    Pin* temp = create_pin(0, 0.5);
     int i;
     for(i = 0; i < pin_array->size; i++){
         int j;
         for(j = 0; j < pin_array->size; j++){
             if(pin_array->arr[j].duty_cycle < pin_array->arr[j - 1].duty_cycle){
-                temp = &pin_array->arr[j];
-                pin_array->arr[j] = pin_array->arr[j - 1];
-                pin_array->arr[j - 1] = *temp;
+                swap(&pin_array->arr[j], &pin_array->arr[j - 1]);                
             }
         }
     }
-    free(temp);
+    return;
 }
 
 #endif
