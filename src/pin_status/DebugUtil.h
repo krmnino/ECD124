@@ -27,19 +27,4 @@ void randomize_duty_cycles(PinArray* pin_array, int lower_range, int upper_range
     return;
 }
 
-int pinid_reg(PinArray* pin_array, int index){
-    int pin_id = pin_array->arr[index].pin_id;
-    return pin_id;
-}
-
-int dutycycle_reg(PinArray* pin_array, int index){
-    int duty_cycle = pin_array->arr[index].duty_cycle;
-    return duty_cycle;
-}
-
-int toggle_reg(PinArray* pin_array, int index){
-    int toggle = pin_array->arr[index].toggle;
-    return toggle;
-}
-
 #endif
