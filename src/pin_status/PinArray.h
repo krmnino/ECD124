@@ -50,7 +50,7 @@ void sort_duty_cycles_IS(PinArray* pin_array){
 //Sort pins by duty cycles using quick sort
 int get_partition(Pin arr[], int start, int end){
     Pin pivot = arr[end];
-    int i = (start - 1);
+    int i = start - 1;
     int j;
     for(j = start; j <= end - 1; j++){
         if(arr[j].duty_cycle < pivot.duty_cycle){
@@ -71,6 +71,7 @@ void sort_duty_cycles_QS(PinArray* pin_array, int start, int end){
         sort_duty_cycles_QS(pin_array, start, partition - 1);
         sort_duty_cycles_QS(pin_array, partition + 1, end);
     }
+    return;
 }
 
 #endif
