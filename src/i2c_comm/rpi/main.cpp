@@ -2,25 +2,15 @@
 #include <stdio.h>
 
 int main(){
-    Session green_session;
-    Session red_session;
+    Session pi_session;
 
-    int ret = green_session.init_i2c(0x2);
+    int ret = pi_session.init_i2c(0x05);
     if(ret < 0){
-	printf("Couldn't init i2c");
+	printf("Couldn't init master i2c device.");
     }
 
-    int ret2 = red_session.init_i2c(0x3);
-    if(ret2 < 0){
-	printf("Couldn't init i2c");
-    }
+    int ret3 = pi_session.send_i2c("example");
 
-    int ret3 = green_session.send_i2c("example");
-    
-
-    green_session.request_i2c();
-    printf("Green: %s\n", green_session.msg_received);
-
-    red_session.request_i2c();
-    printf("Red: %s\n", red_session.msg_received);
+    pi_session.request_i2c();
+    printf("Pi: %s\n", pi_session.msg_received);
 }
