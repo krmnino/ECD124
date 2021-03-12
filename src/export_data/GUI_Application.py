@@ -5,7 +5,7 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
 import CSV_Parser
-import Plotter
+from Plot_Handler import Plot_Handler
 
 import numpy as np
 
@@ -54,17 +54,11 @@ class MainApplication(tk.Frame):
         self.button_quit.grid(row=3, column=0, padx=30, pady=60)
 
     def create_plot(self):
-        self.fig = Figure(figsize=(10, 7), dpi=100)
         self.data_log = CSV_Parser.parse_file('./data/test_data.csv')
-        self.fig.add_subplot(111)
-
-        #t = np.arange(0, 3, .01)
-        #self.fig.add_subplot(111).plot(self.data_log['Date'][-30:], self.data_log['Battery_Voltage'][-30:])
-        self.ax = Plotter.GraphData(self.fig, self.data_log['Date'][-30:], self.data_log['Battery_Voltage'][-30:])
-        self.ax.ax.tick_params(axis='x',labelrotation=90)
+        self.plot = Plot_Handler(self.data_log['Date'][-30:], self.data_log['Battery_Current'][-30:])
+        print(self.data_log['Battery_Voltage'])
         
-
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.center_frame)  # A tk.DrawingArea.
+        self.canvas = FigureCanvasTkAgg(self.plot.get_figure(), master=self.center_frame)  # A tk.DrawingArea.
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=0, column=0)
 
