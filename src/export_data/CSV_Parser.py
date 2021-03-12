@@ -14,10 +14,15 @@ def parse_file(path):
                 continue
             line_split = line.split(',')
             for i, elem in enumerate(line_split):
+                try:
+                    convert_elem = float(elem)
+                except:
+                    convert_elem = elem
+                    pass
                 if header_index[i] not in contents.keys():
-                    contents[header_index[i]] = np.array([elem])
+                    contents[header_index[i]] = np.array([convert_elem])
                 else:
-                    contents[header_index[i]] = np.append(contents[header_index[i]], elem)
+                    contents[header_index[i]] = np.append(contents[header_index[i]], convert_elem)
     return contents
 
 parse_file('data/test.csv')
