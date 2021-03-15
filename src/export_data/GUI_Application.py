@@ -117,8 +117,8 @@ class MainApplication(tk.Frame):
             command = lambda: self.change_plot(7)).grid(row=10, column=0, padx=10, pady=0)
 
     def create_plot(self):
-        self.data_log = CSV_Parser.parse_file('./data/test_data.csv')
-        self.plot = Plot_Handler(self.data_log['Date'][-36:], self.data_log['Battery_Current'][-36:])
+        self.data_log = CSV_Parser.Table('./data/test_data.csv')
+        self.plot = Plot_Handler(self.data_log.get_column('Date')[-36:], self.data_log.get_column('Battery_Current')[-36:])
         self.canvas = FigureCanvasTkAgg(self.plot.get_figure(), master=self.center_frame)  # A tk.DrawingArea.
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=0, column=0)
@@ -126,24 +126,25 @@ class MainApplication(tk.Frame):
     def change_plot(self, input):
         self.current_plot = input
         if(self.current_plot == 0):
-            self.plot.change_plot_data()
+            self.plot.change_plot_data(self.data_log.get_column('Battery_Voltage')[-36:])
         elif(self.current_plot == 1):
-            print('placeholder')
+            self.plot.change_plot_data(self.data_log.get_column('Battery_Current')[-36:])
         elif(self.current_plot == 2):
-            print('placeholder')
+            self.plot.change_plot_data(self.data_log.get_column('Battery_Max_Discharge_Power')[-36:])
         elif(self.current_plot == 3):
-            print('placeholder')
+            self.plot.change_plot_data(self.data_log.get_column('Battery_Max_Regen_Power')[-36:])
         elif(self.current_plot == 4):
-            print('placeholder')
+            self.plot.change_plot_data(self.data_log.get_column('Battery_State')[-36:])
         elif(self.current_plot == 5):
-            print('placeholder')
+            self.plot.change_plot_data(self.data_log.get_column('Battery_Temperature')[-36:])
         elif(self.current_plot == 6):
-            print('placeholder')
+            self.plot.change_plot_data(self.data_log.get_column('WEMS_Target_Power')[-36:])
         elif(self.current_plot == 7):
-            print('placeholder')
+            self.plot.change_plot_data(self.data_log.get_column('WEMS_Power_Direction')[-36:])
+        self.canvas.draw()
 
     def fetch_new_data(self):
-        self.data_log = CSV_Parser.parse_file('./data/test_data.csv')
+        self.data_log.update_data()
         root.after(5000, main_app.fetch_new_data)
         print('Fetch')
 
