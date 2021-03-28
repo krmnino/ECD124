@@ -94,7 +94,7 @@ class MainApplication(tk.Frame):
         default_title = self.config['Fields'].split(',')
         default_title = default_title[1]
         self.plot = Plot_Handler(self.data_log.get_column('Date')[-24:], self.data_log.get_column('Battery_Voltage')[-24:], self.fields[0])
-        self.canvas = FigureCanvasTkAgg(self.plot.get_figure(), master=self.center_frame)  # A tk.DrawingArea.
+        self.canvas = FigureCanvasTkAgg(self.plot.get_figure(), master=self.center_frame)
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=0, column=0)
 
@@ -108,7 +108,7 @@ class MainApplication(tk.Frame):
             temp = self.dd_variable3.get()
         elif(index == 4):
             temp = self.dd_variable4.get()
-        self.plot.change_plot_data(index, self.data_log.get_column('Date')[-24:], self.data_log.get_column(temp)[-24:])
+        self.plot.change_plot_data(index, self.data_log.get_column('Date')[-24:], self.data_log.get_column(temp)[-24:], temp)
         self.canvas.draw()
 
     def fetch_new_data(self):
