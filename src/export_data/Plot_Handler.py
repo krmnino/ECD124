@@ -11,6 +11,7 @@ class Plot_Handler:
     ax = None
 
     def __init__(self, x_data, y_data, default_title):
+        #self.fig = Figure(figsize=(800/100, 480/100), dpi=100)
         self.fig = Figure(figsize=(10, 7), dpi=100)
 
         x_data = self.trim_date(x_data)
@@ -67,7 +68,7 @@ class Plot_Handler:
             self.ax2.cla()
             self.line2 = self.ax2.plot(new_x_data, new_y_data, color='#D43D3D')
             self.dots2 = self.ax2.scatter(new_x_data, new_y_data, color = 'k')
-            self.ax1.set_title(title)
+            self.ax2.set_title(title)
             self.ax2.tick_params(axis='x',labelrotation=90)
             self.ax2.set_xticklabels(labels=new_x_data, fontsize=9)
             self.ax2.grid()

@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import font as tkFont
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
@@ -19,6 +20,7 @@ class MainApplication(tk.Frame):
         self.create_control_frame_buttons()
         self.create_dropdown_menus()
         self.create_plots()
+        self.create_data_registers()
         
 
     def load_config_file(self):
@@ -34,7 +36,7 @@ class MainApplication(tk.Frame):
         self.master.resizable(False, False)
 
         # Create three main regions in GUI (left: control panel, center: plot, right: data/status monitor)
-        self.left_frame = tk.Frame(width=205, height=720, background='#C7C7C7')
+        self.left_frame = tk.Frame(width=180, height=720, background='#C7C7C7')
         self.left_frame.grid_propagate(0)
         self.left_frame.grid(row=0, column=0)
 
@@ -47,7 +49,9 @@ class MainApplication(tk.Frame):
         self.right_frame.grid(row=0, column=2)      
 
     def create_control_frame_buttons(self):
+        #helv36 = tkFont.Font(family='Helvetica', size=5, weight='bold')
         self.button_resume = tk.Button(self.left_frame, width = 15, height = 1, text='Resume ' + u'\u23F5')
+        #self.button_resume['font'] = helv36
         self.button_resume.grid(row=0, column=0, padx=30, pady=(10, 0))
 
         self.button_pause = tk.Button(self.left_frame, width = 15, height = 1, text='Pause ' + u'\u23F8')
@@ -98,6 +102,89 @@ class MainApplication(tk.Frame):
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=0, column=0)
 
+    def create_data_registers(self):
+        self.title_status_label = tk.Label(self.right_frame, text="Connection Statuses", background='#C7C7C7')
+        self.title_status_label.grid(row=0, column=1, padx=0, pady=(10, 0))
+
+        self.BMS_status_label = tk.Label(self.right_frame, text="BMS Status: ", background='#C7C7C7')
+        self.BMS_status_label.grid(row=1, column=0, padx=0, pady=(10, 0))
+        self.BMS_status = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.BMS_status, 'null')
+        self.BMS_status.grid(row=1, column=1, padx=0, pady=(10, 0))
+
+        self.WEMS_status_label = tk.Label(self.right_frame, text="WEMS Status: ", background='#C7C7C7')
+        self.WEMS_status_label.grid(row=2, column=0, padx=0, pady=(10, 0))
+        self.WEMS_status = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.WEMS_status, 'null')
+        self.WEMS_status.grid(row=2, column=1, padx=0, pady=(10, 0))
+
+        self.ACPower_status_label = tk.Label(self.right_frame, text="ACPow Status: ", background='#C7C7C7')
+        self.ACPower_status_label.grid(row=3, column=0, padx=0, pady=(10, 0))
+        self.ACPower_status = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.ACPower_status, 'null')
+        self.ACPower_status.grid(row=3, column=1, padx=0, pady=(10, 0))
+
+        self.battery_status_label = tk.Label(self.right_frame, text="Battery Status: ", background='#C7C7C7')
+        self.battery_status_label.grid(row=4, column=0, padx=0, pady=(10, 0))
+        self.battery_status = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.battery_status, 'null')
+        self.battery_status.grid(row=4, column=1, padx=0, pady=(10, 0))
+
+        self.retry_connection_button = tk.Button(self.right_frame, width = 15, height = 1, text='Retry Connections')
+        self.retry_connection_button.grid(row=5, column=1, padx=(10, 0), pady=(10, 0))
+
+        self.title_status_label = tk.Label(self.right_frame, text="Current Readings", background='#C7C7C7')
+        self.title_status_label.grid(row=6, column=1, padx=0, pady=(250, 0))
+
+        self.bat_voltage_label = tk.Label(self.right_frame, text="Battery Voltage: ", background='#C7C7C7')
+        self.bat_voltage_label.grid(row=7, column=0, padx=0, pady=(10, 0))
+        self.bat_voltage = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.bat_voltage, 'null')
+        self.bat_voltage.grid(row=7, column=1, padx=0, pady=(10, 0))
+
+        self.bat_current_label = tk.Label(self.right_frame, text="Battery Current: ", background='#C7C7C7')
+        self.bat_current_label.grid(row=8, column=0, padx=0, pady=(10, 0))
+        self.bat_current = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.bat_current, 'null')
+        self.bat_current.grid(row=8, column=1, padx=0, pady=(10, 0))
+
+        self.bat_max_discharge_label = tk.Label(self.right_frame, text="Bat MaxDschrg: ", background='#C7C7C7')
+        self.bat_max_discharge_label.grid(row=9, column=0, padx=0, pady=(10, 0))
+        self.bat_max_discharge = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.bat_max_discharge, 'null')
+        self.bat_max_discharge.grid(row=9, column=1, padx=0, pady=(10, 0))
+
+        self.bat_max_regen_label = tk.Label(self.right_frame, text="Bat MaxRegen: ", background='#C7C7C7')
+        self.bat_max_regen_label.grid(row=10, column=0, padx=0, pady=(10, 0))
+        self.bat_max_regen = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.bat_max_regen, 'null')
+        self.bat_max_regen.grid(row=10, column=1, padx=0, pady=(10, 0))
+
+        self.bat_state_label = tk.Label(self.right_frame, text="Battery State: ", background='#C7C7C7')
+        self.bat_state_label.grid(row=11, column=0, padx=0, pady=(10, 0))
+        self.bat_state = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.bat_state, 'null')
+        self.bat_state.grid(row=11, column=1, padx=0, pady=(10, 0))
+
+        self.bat_temperature_label = tk.Label(self.right_frame, text="Battery Temp: ", background='#C7C7C7')
+        self.bat_temperature_label.grid(row=12, column=0, padx=0, pady=(10, 0))
+        self.bat_temperature = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.bat_temperature, 'null')
+        self.bat_temperature.grid(row=12, column=1, padx=0, pady=(10, 0))
+
+        self.wems_target_pow_label = tk.Label(self.right_frame, text="WEMS TrgtPow: ", background='#C7C7C7')
+        self.wems_target_pow_label.grid(row=13, column=0, padx=0, pady=(10, 0))
+        self.wems_target_pow = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.wems_target_pow, 'null')
+        self.wems_target_pow.grid(row=13, column=1, padx=0, pady=(10, 0))
+
+        self.wems_pow_direction_label = tk.Label(self.right_frame, text="WEMS PowDir: ", background='#C7C7C7')
+        self.wems_pow_direction_label.grid(row=14, column=0, padx=0, pady=(10, 0))
+        self.wems_pow_direction = tk.Entry(self.right_frame, width=20)
+        self.update_gui_register(self.wems_pow_direction, 'null')
+        self.wems_pow_direction.grid(row=14, column=1, padx=0, pady=(10, 0))
+
+        
     def change_plot(self, index):
         temp = ''
         if(index == 1):
@@ -110,6 +197,12 @@ class MainApplication(tk.Frame):
             temp = self.dd_variable4.get()
         self.plot.change_plot_data(index, self.data_log.get_column('Date')[-24:], self.data_log.get_column(temp)[-24:], temp)
         self.canvas.draw()
+
+    def update_gui_register(self, button, value):
+        button.config(state='normal')
+        button.delete(0, 'end')
+        button.insert(0, str(value))
+        button.config(state='readonly')
 
     def fetch_new_data(self):
         self.data_log.update_data()
