@@ -97,7 +97,7 @@ class MainApplication(tk.Frame):
         self.data_log = CSV_Parser.Table('./data/test_data.csv')
         default_title = self.config['Fields'].split(',')
         default_title = default_title[1]
-        self.plot = Plot_Handler(self.data_log.get_column('Date')[-24:], self.data_log.get_column('Battery_Voltage')[-24:], self.fields[0])
+        self.plot = Plot_Handler(self.data_log, self.fields[0])
         self.canvas = FigureCanvasTkAgg(self.plot.get_figure(), master=self.center_frame)
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=0, column=0)
@@ -186,16 +186,16 @@ class MainApplication(tk.Frame):
 
         
     def change_plot(self, index):
-        temp = ''
+        field = ''
         if(index == 1):
-            temp = self.dd_variable1.get()
+            field = self.dd_variable1.get()
         elif(index == 2):
-            temp = self.dd_variable2.get()
+            field = self.dd_variable2.get()
         elif(index == 3):
-            temp = self.dd_variable3.get()
+            field = self.dd_variable3.get()
         elif(index == 4):
-            temp = self.dd_variable4.get()
-        self.plot.change_plot_data(index, self.data_log.get_column('Date')[-24:], self.data_log.get_column(temp)[-24:], temp)
+            field = self.dd_variable4.get()
+        self.plot.change_plot_data(index, field, self.data_log)
         self.canvas.draw()
 
     def update_gui_register(self, button, value):
@@ -206,6 +206,11 @@ class MainApplication(tk.Frame):
 
     def fetch_new_data(self):
         self.data_log.update_data()
+        self.plot.update_top_left(self.data_log)
+        self.plot.update_top_right(self.data_log)
+        self.plot.update_bottom_left(self.data_log)
+        self.plot.update_bottom_right(self.data_log)
+        self.canvas.draw()
         root.after(5000, main_app.fetch_new_data)
         print('Fetch')
 

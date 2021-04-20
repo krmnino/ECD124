@@ -1,7 +1,7 @@
 import numpy as np
 
 class Table:
-    def __init__(self, path):
+    def __init__(self, path, mode='n'):
         self.filename = path
         self.header_index = {}
         self.contents = {}
@@ -20,7 +20,10 @@ class Table:
                     try:
                         convert_elem = float(elem)
                     except:
-                        convert_elem = elem
+                        if(mode == 't'):
+                            convert_elem = elem
+                        else:
+                            convert_elem = elem.split(' ')[1]
                         pass
                     if self.header_index[i] not in self.contents.keys():
                         self.contents[self.header_index[i]] = np.array([convert_elem])

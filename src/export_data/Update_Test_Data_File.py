@@ -19,7 +19,7 @@ def write_new_data(test_data, fields):
 
 def run(path, fields, sleep_time):
     while(True):
-        test_data = Table(path)
+        test_data = Table(path, mode='t')
         write_new_data(test_data, fields)
         test_data.save_as_csv(path)
         print('Updated file. Sleep for', sleep_time, 'seconds')
