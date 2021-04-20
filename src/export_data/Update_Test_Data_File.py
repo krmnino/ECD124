@@ -1,5 +1,6 @@
 import random
 import datetime
+import time
 
 from CSV_Parser import Table
 
@@ -16,7 +17,16 @@ def write_new_data(test_data, fields):
             new_data[i] = random.randrange(fields[i][0], fields[i][1] + 1, 1)
     test_data.append_entry(new_data)
 
+def run(path, fields, sleep_time):
+    while(True):
+        test_data = Table(path)
+        write_new_data(test_data, fields)
+        test_data.save_as_csv(path)
+        print('Updated file. Sleep for', sleep_time, 'seconds')
+        time.sleep(5)
+
 path = './data/test_data.csv'
+sleep_time = 5
 fields = {
     'Battery_Voltage' : (200, 500),
     'Battery_Current' : (10, 70),
@@ -28,6 +38,4 @@ fields = {
     'WEMS_Power_Direction' : (0, 1),
 }
 
-test_data = Table(path)
-write_new_data(test_data, fields)
-test_data.save_as_csv(path)
+run(path, fields, sleep_time)
