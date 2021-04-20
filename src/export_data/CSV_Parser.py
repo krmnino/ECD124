@@ -66,6 +66,25 @@ class Table:
             file.write(out)
 
     def update_data(self):
-        for line in reversed(list(open(self.filename))):
-            print(line.rstrip())
+        new_data_pool = []
+        with open(self.filename) as file:
+            for i, line in enumerate(reversed(list(file))):
+                line_split = line.split(',')
+                if(line_split[0] == 'Date'):
+                    break
+                if(line_split[0].split(' ')[1] == self.get_latest_entry()['Date']):
+                    break
+                else:
+                    new_data = {}
+                    for j, val in enumerate(self.get_fields()):
+                        try:
+                            temp = float(line_split[j])
+                            new_data[val] = temp
+                        except:
+                            temp = line_split[0].split(' ')[1]
+                            new_data[val] = temp
+                    new_data_pool.insert(0, new_data)
+        for i in new_data_pool:
+            print(i['Date'])
+            self.append_entry(i)
     

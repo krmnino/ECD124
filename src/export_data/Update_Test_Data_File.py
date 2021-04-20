@@ -23,7 +23,7 @@ def run(path, fields, sleep_time):
         write_new_data(test_data, fields)
         test_data.save_as_csv(path)
         print('Updated file. Sleep for', sleep_time, 'seconds')
-        time.sleep(5)
+        time.sleep(sleep_time)
 
 path = './data/test_data.csv'
 sleep_time = 5
