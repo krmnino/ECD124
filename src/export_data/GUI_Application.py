@@ -11,11 +11,12 @@ from Plot_Handler import Plot_Handler
 import numpy as np
 
 class MainApplication(tk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, log_file_path, config_file_path):
+        run_animation = True
         self.current_plot = 0
         self.master = master
         tk.Frame.__init__(self, self.master)
-        self.load_config_file()
+        self.load_config_file(config_file_path)
         self.configure_gui()
         self.create_control_frame_buttons()
         self.create_dropdown_menus()
@@ -23,15 +24,15 @@ class MainApplication(tk.Frame):
         self.create_data_registers()
         
 
-    def load_config_file(self):
+    def load_config_file(self, config_file_path):
         self.config = {}
-        with open('Config.dat') as file:
+        with open(config_file_path) as file:
             for line in file:
                 split_line = line.split('=')
                 self.config[split_line[0]] = split_line[1]
 
     def configure_gui(self):
-        self.master.title('GUI')
+        self.master.title('Console v1.0')
         self.master.geometry('1400x720')
         self.master.resizable(False, False)
 
@@ -50,17 +51,18 @@ class MainApplication(tk.Frame):
 
     def create_control_frame_buttons(self):
         #helv36 = tkFont.Font(family='Helvetica', size=5, weight='bold')
-        self.button_resume = tk.Button(self.left_frame, width = 15, height = 1, text='Resume ' + u'\u23F5')
+        self.button_resume = tk.Button(self.left_frame, width = 15, height = 1, text='Resume ' + u'\u23F5', command = lambda : self.play_animation())
         #self.button_resume['font'] = helv36
         self.button_resume.grid(row=0, column=0, padx=30, pady=(10, 0))
+        self.button_resume.config(relief='sunken')
 
-        self.button_pause = tk.Button(self.left_frame, width = 15, height = 1, text='Pause ' + u'\u23F8')
+        self.button_pause = tk.Button(self.left_frame, width = 15, height = 1, text='Pause ' + u'\u23F8', command = lambda : self.pause_animation())
         self.button_pause.grid(row=1, column=0, padx=30, pady=(10, 0))
 
         self.button_save_plot = tk.Button(self.left_frame, width = 15, height = 1, text='Save Plot')
         self.button_save_plot.grid(row=11, column=0, padx=30, pady=(240, 0))
 
-        self.button_quit = tk.Button(self.left_frame, width = 15, height = 1, text='Quit')
+        self.button_quit = tk.Button(self.left_frame, width = 15, height = 1, text='Quit', command=self.master.destroy)
         self.button_quit.grid(row=12, column=0, padx=30, pady=(10, 0))
 
     def create_dropdown_menus(self):
@@ -94,7 +96,7 @@ class MainApplication(tk.Frame):
         self.dd_plot4.grid(row=6, column=0, padx=10, pady=(10,0))
 
     def create_plots(self):
-        self.data_log = CSV_Parser.Table('./data/test_data.csv')
+        self.data_log = CSV_Parser.Table(log_file_path)
         default_title = self.config['Fields'].split(',')
         default_title = default_title[1]
         self.plot = Plot_Handler(self.data_log, self.fields[0])
@@ -184,6 +186,15 @@ class MainApplication(tk.Frame):
         self.update_gui_register(self.wems_pow_direction, 'null')
         self.wems_pow_direction.grid(row=14, column=1, padx=0, pady=(10, 0))
 
+        latest_data = self.data_log.get_latest_entry()
+        self.update_gui_register(self.bat_voltage, latest_data['Battery_Voltage'])
+        self.update_gui_register(self.bat_current, latest_data['Battery_Current'])        
+        self.update_gui_register(self.bat_max_discharge, latest_data['Battery_Max_Discharge_Power'])
+        self.update_gui_register(self.bat_max_regen, latest_data['Battery_Max_Regen_Power'])
+        self.update_gui_register(self.bat_state, latest_data['Battery_State'])
+        self.update_gui_register(self.bat_temperature, latest_data['Battery_Temperature'])
+        self.update_gui_register(self.wems_target_pow, latest_data['WEMS_Target_Power'])
+        self.update_gui_register(self.wems_pow_direction, latest_data['WEMS_Power_Direction'])
         
     def change_plot(self, index):
         field = ''
@@ -204,7 +215,10 @@ class MainApplication(tk.Frame):
         text_field.insert(0, str(value))
         text_field.config(state='readonly')
 
-    def update_gui_new_data(self):
+    def update_gui_new_data(self, update_status):
+        if(not update_status):
+            return
+
         # read and process new data 
         self.data_log.update_data()
 
@@ -228,9 +242,25 @@ class MainApplication(tk.Frame):
         root.after(5000, main_app.update_gui_new_data)
         print('Fetch')
 
+    def play_animation(self):
+        self.run_animation = True
+        self.button_resume.config(relief='sunken')
+        self.button_pause.config(relief='raised')
+        return
+
+    def pause_animation(self):
+        self.run_animation = False
+        self.button_resume.config(relief='raised')
+        self.button_pause.config(relief='sunken')
+        return
+
 if __name__ == '__main__':
-    root = tk.Tk()
-    main_app =  MainApplication(root)
     
+    log_file_path = './data/test_data.csv'
+    config_file_path = 'Config.dat'
+    
+    root = tk.Tk()
+    main_app =  MainApplication(root, log_file_path, config_file_path)
+
     root.after(5000, main_app.update_gui_new_data)
     root.mainloop()
