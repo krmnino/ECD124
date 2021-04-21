@@ -198,25 +198,39 @@ class MainApplication(tk.Frame):
         self.plot.change_plot_data(index, field, self.data_log)
         self.canvas.draw()
 
-    def update_gui_register(self, button, value):
-        button.config(state='normal')
-        button.delete(0, 'end')
-        button.insert(0, str(value))
-        button.config(state='readonly')
+    def update_gui_register(self, text_field, value):
+        text_field.config(state='normal')
+        text_field.delete(0, 'end')
+        text_field.insert(0, str(value))
+        text_field.config(state='readonly')
 
-    def fetch_new_data(self):
+    def update_gui_new_data(self):
+        # read and process new data 
         self.data_log.update_data()
+
+        # update data registers
+        latest_data = self.data_log.get_latest_entry()
+        self.update_gui_register(self.bat_voltage, latest_data['Battery_Voltage'])
+        self.update_gui_register(self.bat_current, latest_data['Battery_Current'])        
+        self.update_gui_register(self.bat_max_discharge, latest_data['Battery_Max_Discharge_Power'])
+        self.update_gui_register(self.bat_max_regen, latest_data['Battery_Max_Regen_Power'])
+        self.update_gui_register(self.bat_state, latest_data['Battery_State'])
+        self.update_gui_register(self.bat_temperature, latest_data['Battery_Temperature'])
+        self.update_gui_register(self.wems_target_pow, latest_data['WEMS_Target_Power'])
+        self.update_gui_register(self.wems_pow_direction, latest_data['WEMS_Power_Direction'])
+
+        # animate GUI with new data
         self.plot.update_top_left(self.data_log)
         self.plot.update_top_right(self.data_log)
         self.plot.update_bottom_left(self.data_log)
         self.plot.update_bottom_right(self.data_log)
         self.canvas.draw()
-        root.after(5000, main_app.fetch_new_data)
+        root.after(5000, main_app.update_gui_new_data)
         print('Fetch')
 
 if __name__ == '__main__':
     root = tk.Tk()
     main_app =  MainApplication(root)
     
-    root.after(5000, main_app.fetch_new_data)
+    root.after(5000, main_app.update_gui_new_data)
     root.mainloop()
