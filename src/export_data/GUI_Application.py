@@ -4,6 +4,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationTool
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
+import datetime
 
 import CSV_Parser
 from Plot_Handler import Plot_Handler
@@ -59,7 +60,7 @@ class MainApplication(tk.Frame):
         self.button_pause = tk.Button(self.left_frame, width = 15, height = 1, text='Pause ' + u'\u23F8', command = lambda : self.pause_animation())
         self.button_pause.grid(row=1, column=0, padx=30, pady=(10, 0))
 
-        self.button_save_plot = tk.Button(self.left_frame, width = 15, height = 1, text='Save Plot')
+        self.button_save_plot = tk.Button(self.left_frame, width = 15, height = 1, text='Save Plot', command = lambda : self.screenshot_plots())
         self.button_save_plot.grid(row=11, column=0, padx=30, pady=(240, 0))
 
         self.button_quit = tk.Button(self.left_frame, width = 15, height = 1, text='Quit', command=self.master.destroy)
@@ -132,69 +133,60 @@ class MainApplication(tk.Frame):
         self.update_gui_register(self.battery_status, 'null')
         self.battery_status.grid(row=4, column=1, padx=0, pady=(10, 0))
 
-        self.retry_connection_button = tk.Button(self.right_frame, width = 15, height = 1, text='Retry Connections')
+        self.retry_connection_button = tk.Button(self.right_frame, width = 15, height = 1, text='Retry Connections', command = lambda : self.retry_connections())
         self.retry_connection_button.grid(row=5, column=1, padx=(10, 0), pady=(10, 0))
 
         self.title_status_label = tk.Label(self.right_frame, text="Current Readings", background='#C7C7C7')
         self.title_status_label.grid(row=6, column=1, padx=0, pady=(250, 0))
 
+        latest_data = self.data_log.get_latest_entry()
         self.bat_voltage_label = tk.Label(self.right_frame, text="Battery Voltage: ", background='#C7C7C7')
         self.bat_voltage_label.grid(row=7, column=0, padx=0, pady=(10, 0))
         self.bat_voltage = tk.Entry(self.right_frame, width=20)
-        self.update_gui_register(self.bat_voltage, 'null')
+        self.update_gui_register(self.bat_voltage, latest_data['Battery_Voltage'])
         self.bat_voltage.grid(row=7, column=1, padx=0, pady=(10, 0))
 
         self.bat_current_label = tk.Label(self.right_frame, text="Battery Current: ", background='#C7C7C7')
         self.bat_current_label.grid(row=8, column=0, padx=0, pady=(10, 0))
         self.bat_current = tk.Entry(self.right_frame, width=20)
-        self.update_gui_register(self.bat_current, 'null')
+        self.update_gui_register(self.bat_current, latest_data['Battery_Current'])
         self.bat_current.grid(row=8, column=1, padx=0, pady=(10, 0))
 
         self.bat_max_discharge_label = tk.Label(self.right_frame, text="Bat MaxDschrg: ", background='#C7C7C7')
         self.bat_max_discharge_label.grid(row=9, column=0, padx=0, pady=(10, 0))
         self.bat_max_discharge = tk.Entry(self.right_frame, width=20)
-        self.update_gui_register(self.bat_max_discharge, 'null')
+        self.update_gui_register(self.bat_max_discharge, latest_data['Battery_Max_Discharge_Power'])
         self.bat_max_discharge.grid(row=9, column=1, padx=0, pady=(10, 0))
 
         self.bat_max_regen_label = tk.Label(self.right_frame, text="Bat MaxRegen: ", background='#C7C7C7')
         self.bat_max_regen_label.grid(row=10, column=0, padx=0, pady=(10, 0))
         self.bat_max_regen = tk.Entry(self.right_frame, width=20)
-        self.update_gui_register(self.bat_max_regen, 'null')
+        self.update_gui_register(self.bat_max_regen, latest_data['Battery_Max_Regen_Power'])
         self.bat_max_regen.grid(row=10, column=1, padx=0, pady=(10, 0))
 
         self.bat_state_label = tk.Label(self.right_frame, text="Battery State: ", background='#C7C7C7')
         self.bat_state_label.grid(row=11, column=0, padx=0, pady=(10, 0))
         self.bat_state = tk.Entry(self.right_frame, width=20)
-        self.update_gui_register(self.bat_state, 'null')
+        self.update_gui_register(self.bat_state, latest_data['Battery_State'])
         self.bat_state.grid(row=11, column=1, padx=0, pady=(10, 0))
 
         self.bat_temperature_label = tk.Label(self.right_frame, text="Battery Temp: ", background='#C7C7C7')
         self.bat_temperature_label.grid(row=12, column=0, padx=0, pady=(10, 0))
         self.bat_temperature = tk.Entry(self.right_frame, width=20)
-        self.update_gui_register(self.bat_temperature, 'null')
+        self.update_gui_register(self.bat_temperature, latest_data['Battery_Temperature'])
         self.bat_temperature.grid(row=12, column=1, padx=0, pady=(10, 0))
 
         self.wems_target_pow_label = tk.Label(self.right_frame, text="WEMS TrgtPow: ", background='#C7C7C7')
         self.wems_target_pow_label.grid(row=13, column=0, padx=0, pady=(10, 0))
         self.wems_target_pow = tk.Entry(self.right_frame, width=20)
-        self.update_gui_register(self.wems_target_pow, 'null')
+        self.update_gui_register(self.wems_target_pow, latest_data['WEMS_Target_Power'])
         self.wems_target_pow.grid(row=13, column=1, padx=0, pady=(10, 0))
 
         self.wems_pow_direction_label = tk.Label(self.right_frame, text="WEMS PowDir: ", background='#C7C7C7')
         self.wems_pow_direction_label.grid(row=14, column=0, padx=0, pady=(10, 0))
         self.wems_pow_direction = tk.Entry(self.right_frame, width=20)
-        self.update_gui_register(self.wems_pow_direction, 'null')
-        self.wems_pow_direction.grid(row=14, column=1, padx=0, pady=(10, 0))
-
-        latest_data = self.data_log.get_latest_entry()
-        self.update_gui_register(self.bat_voltage, latest_data['Battery_Voltage'])
-        self.update_gui_register(self.bat_current, latest_data['Battery_Current'])        
-        self.update_gui_register(self.bat_max_discharge, latest_data['Battery_Max_Discharge_Power'])
-        self.update_gui_register(self.bat_max_regen, latest_data['Battery_Max_Regen_Power'])
-        self.update_gui_register(self.bat_state, latest_data['Battery_State'])
-        self.update_gui_register(self.bat_temperature, latest_data['Battery_Temperature'])
-        self.update_gui_register(self.wems_target_pow, latest_data['WEMS_Target_Power'])
         self.update_gui_register(self.wems_pow_direction, latest_data['WEMS_Power_Direction'])
+        self.wems_pow_direction.grid(row=14, column=1, padx=0, pady=(10, 0))
         
     def change_plot(self, index):
         field = ''
@@ -253,11 +245,23 @@ class MainApplication(tk.Frame):
         self.button_resume.config(relief='raised')
         self.button_pause.config(relief='sunken')
         return 
+        
+    def screenshot_plots(self):
+        now = datetime.datetime.now()
+        current_time = now.strftime('%Y-%m-%d_%H-%M-%S')
+        self.plot.get_figure().savefig('Screenshot_' + current_time)
+        return 
 
-if __name__ == '__main__':
+    def retry_connections(self):
+        #TODO: interface with Keenan's code
+        print('retry connections')
+        return
+
+if(__name__ == '__main__'):
     
     log_file_path = './data/test_data.csv'
     config_file_path = 'Config.dat'
+
     
     root = tk.Tk()
     main_app =  MainApplication(root, log_file_path, config_file_path)
