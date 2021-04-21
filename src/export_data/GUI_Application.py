@@ -12,7 +12,7 @@ import numpy as np
 
 class MainApplication(tk.Frame):
     def __init__(self, master, log_file_path, config_file_path):
-        run_animation = True
+        self.run_animation = True
         self.current_plot = 0
         self.master = master
         tk.Frame.__init__(self, self.master)
@@ -215,8 +215,9 @@ class MainApplication(tk.Frame):
         text_field.insert(0, str(value))
         text_field.config(state='readonly')
 
-    def update_gui_new_data(self, update_status):
-        if(not update_status):
+    def update_gui_new_data(self):
+        if(not self.run_animation):
+            root.after(5000, main_app.update_gui_new_data)
             return
 
         # read and process new data 
@@ -240,8 +241,7 @@ class MainApplication(tk.Frame):
         self.plot.update_bottom_right(self.data_log)
         self.canvas.draw()
         root.after(5000, main_app.update_gui_new_data)
-        print('Fetch')
-
+        
     def play_animation(self):
         self.run_animation = True
         self.button_resume.config(relief='sunken')
@@ -252,7 +252,7 @@ class MainApplication(tk.Frame):
         self.run_animation = False
         self.button_resume.config(relief='raised')
         self.button_pause.config(relief='sunken')
-        return
+        return 
 
 if __name__ == '__main__':
     
