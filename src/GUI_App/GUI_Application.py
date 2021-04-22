@@ -266,7 +266,6 @@ class MainApplication(tk.Frame):
         self.plot.update_bottom_left(self.data_log)
         self.plot.update_bottom_right(self.data_log)
         self.canvas.draw()
-        print('Fetch')
         root.after(5000, main_app.update_gui_new_data)
         
     def play_animation(self):
@@ -292,7 +291,6 @@ class MainApplication(tk.Frame):
             for line in file.readlines():
                 split_line = line.split('=')
                 self.connection_statuses[split_line[0]] = int(split_line[1].replace('\n', ''))
-        print(self.connection_statuses)
         return
 
     def retry_connections(self):
