@@ -12,8 +12,11 @@ from Plot_Handler import Plot_Handler
 import numpy as np
 
 class MainApplication(tk.Frame):
-    def __init__(self, master, log_file_path, config_file_path):
+    def __init__(self, master, log_file_path, config_file_path, connection_file_path):
         self.run_animation = True
+        self.log_file = log_file_path
+        self.config_file = config_file_path
+        self.connection_status_file = connection_status_file_path
         self.connection_statuses = {
             'bms_status' : 0,
             'wems_status' : 0,
@@ -24,7 +27,7 @@ class MainApplication(tk.Frame):
         self.master = master
 
         tk.Frame.__init__(self, self.master)
-        self.load_config_file(config_file_path)
+        self.load_config_file(self.config_file)
         self.configure_gui()
         self.create_control_frame_buttons()
         self.create_dropdown_menus()
@@ -103,7 +106,7 @@ class MainApplication(tk.Frame):
         self.dd_plot4.grid(row=6, column=0, padx=10, pady=(10,0))
 
     def create_plots(self):
-        self.data_log = CSV_Parser.Table(log_file_path)
+        self.data_log = CSV_Parser.Table(self.log_file)
         default_title = self.config['Fields'].split(',')
         default_title = default_title[1]
         self.plot = Plot_Handler(self.data_log, self.fields[0])
@@ -235,12 +238,35 @@ class MainApplication(tk.Frame):
         self.update_gui_register(self.wems_target_pow, latest_data['WEMS_Target_Power'])
         self.update_gui_register(self.wems_pow_direction, latest_data['WEMS_Power_Direction'])
 
+        # update connection status registers
+        self.read_connection_status_data()
+        if(self.connection_statuses['bms_status'] == 0):
+            self.update_gui_register(self.BMS_status, 'Disconnected')
+        elif(self.connection_statuses['bms_status'] == 1):
+            self.update_gui_register(self.BMS_status, 'Connected')
+
+        if(self.connection_statuses['wems_status'] == 0):
+            self.update_gui_register(self.WEMS_status, 'Disconnected')
+        elif(self.connection_statuses['wems_status'] == 1):
+            self.update_gui_register(self.WEMS_status, 'Connected')
+
+        if(self.connection_statuses['ac_power_status'] == 0):
+            self.update_gui_register(self.ACPower_status, 'Disconnected')
+        elif(self.connection_statuses['ac_power_status'] == 1):
+            self.update_gui_register(self.ACPower_status, 'Connected')
+
+        if(self.connection_statuses['battery_status'] == 0):
+            self.update_gui_register(self.battery_status, 'Disconnected')
+        elif(self.connection_statuses['battery_status'] == 1):
+            self.update_gui_register(self.battery_status, 'Connected')
+
         # animate GUI with new data
         self.plot.update_top_left(self.data_log)
         self.plot.update_top_right(self.data_log)
         self.plot.update_bottom_left(self.data_log)
         self.plot.update_bottom_right(self.data_log)
         self.canvas.draw()
+        print('Fetch')
         root.after(5000, main_app.update_gui_new_data)
         
     def play_animation(self):
@@ -261,22 +287,33 @@ class MainApplication(tk.Frame):
         self.plot.get_figure().savefig('Screenshot_' + current_time)
         return 
 
+    def read_connection_status_data(self):
+        with open(self.connection_status_file) as file:
+            for line in file.readlines():
+                split_line = line.split('=')
+                self.connection_statuses[split_line[0]] = int(split_line[1].replace('\n', ''))
+        print(self.connection_statuses)
+        return
+
+
     def retry_connections(self):
         self.retry_connection_button.config(relief='sunken')
         #TODO: interface with Keenan's code
-        #   Call function to reconnect
-        #   Retrieve connection status
-        #   Update connection status dictionary appropriately
+        #   Call function(s) to reconnect
+        #       reconnect_bms()
+        #       reconnect_wems()
+        #       reconnect_ac_power()
+        #       reconnect_battery()
         return
 
 if(__name__ == '__main__'):
     
     log_file_path = './data/test_data.csv'
     config_file_path = 'Config.dat'
-
+    connection_status_file_path = './data/Connection_Status.dat'
     
     root = tk.Tk()
-    main_app =  MainApplication(root, log_file_path, config_file_path)
+    main_app =  MainApplication(root, log_file_path, config_file_path, connection_status_file_path)
 
     root.after(5000, main_app.update_gui_new_data)
     root.mainloop()
