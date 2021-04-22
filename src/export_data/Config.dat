@@ -1,2 +1,0 @@
-Fields=Date,Battery_Voltage,Battery_Current,Battery_Max_Discharge_Power,Battery_Max_Regen_Power,Battery_State,Battery_Temperature,WEMS_Target_Power,WEMS_Power_Direction
-Date_Plot_Format=%H:%M:%S
