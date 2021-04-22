@@ -1,9 +1,9 @@
 import datetime
 import random
 
-def generate_data(start_date, fields, data_points):
+def generate_data(start_date, fields, data_points, filename):
     out = 'Date,'
-    with open('./data/test_data.csv', 'w') as file:
+    with open('./data/' + filename, 'w') as file:
         for i in fields.keys():
             out += i + ','
         out += '\n'
@@ -31,5 +31,6 @@ fields = {
 date_str = '2021-01-05 08:00:00'
 start_date = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
 data_points = 300
+filename = 'test_data2.csv'
 
-generate_data(start_date, fields, data_points)
+generate_data(start_date, fields, data_points, filename)
