@@ -14,8 +14,15 @@ import numpy as np
 class MainApplication(tk.Frame):
     def __init__(self, master, log_file_path, config_file_path):
         self.run_animation = True
+        self.connection_statuses = {
+            'bms_status' : 0,
+            'wems_status' : 0,
+            'ac_power_status' : 0,
+            'battery_status' : 0
+        }
         self.current_plot = 0
         self.master = master
+
         tk.Frame.__init__(self, self.master)
         self.load_config_file(config_file_path)
         self.configure_gui()
@@ -24,7 +31,6 @@ class MainApplication(tk.Frame):
         self.create_plots()
         self.create_data_registers()
         
-
     def load_config_file(self, config_file_path):
         self.config = {}
         with open(config_file_path) as file:
@@ -212,6 +218,9 @@ class MainApplication(tk.Frame):
             root.after(5000, main_app.update_gui_new_data)
             return
 
+        # re-enable retry connections button
+        self.retry_connection_button.config(relief='raised')
+
         # read and process new data 
         self.data_log.update_data()
 
@@ -253,8 +262,11 @@ class MainApplication(tk.Frame):
         return 
 
     def retry_connections(self):
+        self.retry_connection_button.config(relief='sunken')
         #TODO: interface with Keenan's code
-        print('retry connections')
+        #   Call function to reconnect
+        #   Retrieve connection status
+        #   Update connection status dictionary appropriately
         return
 
 if(__name__ == '__main__'):
