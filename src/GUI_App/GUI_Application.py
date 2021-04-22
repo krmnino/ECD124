@@ -295,7 +295,6 @@ class MainApplication(tk.Frame):
         print(self.connection_statuses)
         return
 
-
     def retry_connections(self):
         self.retry_connection_button.config(relief='sunken')
         #TODO: interface with Keenan's code
@@ -307,7 +306,6 @@ class MainApplication(tk.Frame):
         return
 
 if(__name__ == '__main__'):
-    
     log_file_path = './data/test_data.csv'
     config_file_path = 'Config.dat'
     connection_status_file_path = './data/Connection_Status.dat'
