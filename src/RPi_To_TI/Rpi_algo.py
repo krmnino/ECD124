@@ -117,14 +117,14 @@ def chargeBattery():
 	global TARGET_POWER
 	if BATTERY_STATE_OF_CHARGE < 100: #Only when all these conditions are met, can the batteries begin to be charged or discharged
 		print("Battery has room to charge!")
-               	if TARGET_POWER > BMS_POWER_CHARGE:
+		if TARGET_POWER > BMS_POWER_CHARGE:
 			TARGET_POWER = BMS_POWER_CHARGE
 			SendChargeMag()
-                    	print("Target power from WEMS reduced to: ",TARGET_POWER)
+			print("Target power from WEMS reduced to: ",TARGET_POWER)
 		else:
 			SendChargeMag()
-                        print("Target power from WEMS unchanged: Charge Target Power: ",TARGET_POWER)
-        else:
+			print("Target power from WEMS unchanged: Charge Target Power: ",TARGET_POWER)
+	else:
 		TARGET_POWER = 0
 		print("Battery has no room to charge! No power exchange will occur.\n")
 def dischargeBattery():
@@ -138,39 +138,47 @@ def dischargeBattery():
 		else:
 			SendDischargeMag()
 			print("Target power from WEMS unchanged:Discharge Target Power: ",TARGET_POWER)
+
+def write_statuses(BMS_CONNECTED, WEMS_CONNECTED, AC_CONNECTED, BATTERY_CONNECTED):
+	with open('../GUI_App/data/Connection_Status.dat', 'w') as file:
+		file.write('bms_status=' + str(BMS_CONNECTED) + '\n') 
+		file.write('wems_status=' + str(WEMS_CONNECTED) + '\n') 
+		file.write('ac_power_status=' + str(AC_CONNECTED) + '\n') 
+		file.write('battery_status=' + str(BATTERY_CONNECTED) + '\n') 
 try:
-    retCode=TI_Handshake()
-    print ("Retcode was ", retCode)
-    if retCode:
-        print("No response, shutting down please check connections and try again")
-        GPIO.cleanup()
-        quit()
-    time.sleep(2)
-    while GPIO.input(STATUS_IN):
-        #Update BMS Variables
-	TARGET_POWER=85
-	print("Sending powerMag: ",TARGET_POWER)
-	print("Power direction is: ",MODE)
-	#Update WEMS Variables
-        if CHARGER_STATUS == 1 and BATTERY_STATUS == 1:
-            print("Charger status and battery status good!")
-            if BATTERY_HIGH_TEMP <= 50 and BATTERY_LOW_TEMP >= 0:
-                print("Battery temperature safe!")
-		if MODE==1:
-			chargeBattery()
+	retCode=TI_Handshake()
+	print ("Retcode was ", retCode)
+	if retCode:
+		print("No response, shutting down please check connections and try again")
+		GPIO.cleanup()
+		quit()
+	time.sleep(2)
+	while GPIO.input(STATUS_IN):
+		#Update BMS Variables
+		TARGET_POWER=85
+		print("Sending powerMag: ",TARGET_POWER)
+		print("Power direction is: ",MODE)
+		#Update WEMS Variables
+		if CHARGER_STATUS == 1 and BATTERY_STATUS == 1:
+			print("Charger status and battery status good!")
+			if BATTERY_HIGH_TEMP <= 50 and BATTERY_LOW_TEMP >= 0:
+				print("Battery temperature safe!")
+				if MODE==1:
+					chargeBattery()
+				else:
+					dischargeBattery()
+			else:
+				TARGET_POWER = 0
+				chargeBattery() # sets power target on TI to 0
+				print("Battery temperature dangerous! No power exchange will occur.\n")
 		else:
-			dischargeBattery()
-            else:
-                TARGET_POWER = 0
-            	chargeBattery() # sets power target on TI to 0
-		print("Battery temperature dangerous! No power exchange will occur.\n")
-    	else:
-        	TARGET_POWER = 0
-		chargeBattery() #Sets power target on TI to 0
-        	print("Charger status or battery status bad! No power exchange will occur.\n")
-	time.sleep(3)
-    print("Error. Shutting Down")
-    GPIO.cleanup()
+			TARGET_POWER = 0
+			chargeBattery() #Sets power target on TI to 0
+			print("Charger status or battery status bad! No power exchange will occur.\n")
+		write_statuses(BMS_CONNECTED, WEMS_CONNECTED, AC_CONNECTED, BATTERY_CONNECTED)
+		time.sleep(3)
+	print("Error. Shutting Down")
+	GPIO.cleanup()
 except KeyboardInterrupt:
 	TI_Shutdown()
 	GPIO.cleanup() #Resets all ports as inputs to protect them
